@@ -2,7 +2,7 @@
 
 ## Descrição
 
-Este documento descreve os User Stories criados a partir da Lista de Requisitos no [Documento 001](/docs/docs.md). Este documento também pode ser adaptado para descrever Casos de Uso. Modelo de documento baseado nas características do processo easYProcess (YP).
+Este documento descreve os User Stories criados a partir da Lista de Requisitos no [Documento 001 - OSM_JUNTAR](/docs/docs.md). Este documento também pode ser adaptado para descrever Casos de Uso. Modelo de documento baseado nas características do processo easYProcess (YP).
 
 ## Histórico de revisões
 
