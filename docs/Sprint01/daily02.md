@@ -1,5 +1,7 @@
 # Resumo da Daily 002
 
+📅 **Data:** 19/09/2025  
+
 - **Nathan Lopes**
   - Terminou a dinâmica das palavras cruzadas no aplicativo.
   - Não sentiu nenhuma dificuldade no processo.

@@ -1,5 +1,7 @@
 # Resumo da Daily 001
 
+📅 **Data:** 17/09/2025  
+
 - **Nathan Lopes**
   - Planejou uma dinâmica de palavras cruzadas para a apresentação do projeto, utilizando o site [criadordecruzadinhas.com.br](https://criadordecruzadinhas.com.br) (sugestão de Hildemberg).
   - **Próximos passos:** Continuar projetando a dinâmica até a próxima daily.
@@ -19,3 +21,4 @@
   - Instruiu o time sobre a linguagem de programação utilizada.
   - Ensinou boas práticas de Git para o time.
   - Sugeriu o uso do site de palavras cruzadas, ajudando Nathan.
+
