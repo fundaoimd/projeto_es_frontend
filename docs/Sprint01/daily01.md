@@ -1,4 +1,5 @@
 # Resumo da Daily 001
+
 📅 **Data:** 17/09/2025  
 
 - **Nathan Lopes**
