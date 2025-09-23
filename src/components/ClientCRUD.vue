@@ -104,7 +104,7 @@ const handleDelete = async (id: number) => {
 
 <template>
   <div class="container">
-    <h1>Gestão de Clientes</h1>
+  <h1>Cadastro de Cliente</h1>
 
     <form @submit.prevent="handleSubmit" class="form-card">
       <h3>{{ isEditing ? 'Editar Cliente' : 'Adicionar Novo Cliente' }}</h3>
