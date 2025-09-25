@@ -7,7 +7,7 @@
   - Não sentiu nenhuma dificuldade no processo.
   - **Próximos passos:** Começar a programar o CRUD.
 
-- **Diego Áxel**
+- **Diêgo Axel**
   - Revisou as *issues* e definiu os níveis de prioridade de cada uma.
   - Estudou um pouco de Vue.js.
   - Sentiu um pouco de dificuldade na linguagem e sugeriu transição para outra.
