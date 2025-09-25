@@ -6,7 +6,7 @@
   - Alertou sobre a necessidade de uma página de login.
   - **Próximos passos:** Continuar na programação.
 
-- **Diego Áxel**
+- **Diêgo Axel**
   - Adicionou um botão na página para mostrar as CRUDs desejadas.
   - **Próximos passos:** Programar a página de login e a parte de agendamento de serviços.
 
