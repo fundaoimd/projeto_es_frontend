@@ -19,5 +19,5 @@
   - Também sugeriu mudança de linguagem.
   - **Próximos passos:** Auxiliar no desenvolvimento do banco de dados para iniciar a programação de fato.
 
-- **Hildemberg**
+- **Hildemberg Elling**
   - Faltou à reunião.
