@@ -7,7 +7,7 @@
   - Criou uma organização no Git para facilitar o trabalho com o front-end e o back-end.
   - **Próximos passos:** Continuar o desenvolvimento do CRUD de clientes.
 
-- **Diego Áxel**
+- **Diêgo Áxel**
   - Configurou o banco de dados e fez a conexão com o back-end e o front-end.
   - Fez ajustes na documentação.
   - **Próximos passos:** Transicionar o banco de dados do PostgreSQL para um mais leve e versátil.
