@@ -13,11 +13,8 @@ interface Client {
 }
 
 // URL da nossa API no backend. Se a porta for diferente, ajusta aqui.
-try {
- response = await api.get('/clients');
-} catch {
-  var API_URL = 'http://localhost:3000/clients';
-}
+
+const API_URL = 'http://localhost:3000/clients';
 
 // --- VARIÁVEIS DE ESTADO ---
 // 'ref' cria uma variável "reativa". Sempre que o seu valor mudar,
