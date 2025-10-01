@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
+import api from '../services/api';
 
 // Define um "molde" (interface) para garantir que todos os objetos de cliente
 // tenham sempre os mesmos campos (id, name, email, phone).
@@ -12,7 +13,11 @@ interface Client {
 }
 
 // URL da nossa API no backend. Se a porta for diferente, ajusta aqui.
-const API_URL = 'http://localhost:3000/api/clients';
+try {
+ response = await api.get('/clients');
+} catch {
+  var API_URL = 'http://localhost:3000/clients';
+}
 
 // --- VARIÁVEIS DE ESTADO ---
 // 'ref' cria uma variável "reativa". Sempre que o seu valor mudar,
