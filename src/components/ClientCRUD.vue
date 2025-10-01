@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import axios from 'axios';
+// Remove a importação direta do 'axios', pois o 'api' já o encapsula.
 import api from '../services/api';
 
-// Define um "molde" (interface) para garantir que todos os objetos de cliente
-// tenham sempre os mesmos campos (id, name, email, phone).
+// A interface Client permanece a mesma.
 interface Client {
   id: number;
   name: string;
@@ -12,21 +11,9 @@ interface Client {
   phone: string;
 }
 
-// URL da nossa API no backend. Se a porta for diferente, ajusta aqui.
-
-const API_URL = 'http://localhost:3000/clients';
-
 // --- VARIÁVEIS DE ESTADO ---
-// 'ref' cria uma variável "reativa". Sempre que o seu valor mudar,
-// o Vue vai atualizar automaticamente o HTML que a estiver a usar.
-
-// 'clients' é a nossa lista de clientes, que começa vazia.
 const clients = ref<Client[]>([]);
-
-// 'formData' representa os dados do formulário. Começa com valores vazios.
 const formData = ref({ id: 0, name: '', email: '', phone: '' });
-
-// 'isEditing' é uma variável que controla se o formulário está em modo de "criação" ou "edição".
 const isEditing = ref(false);
 
 // --- FUNÇÕES ---
@@ -34,23 +21,21 @@ const isEditing = ref(false);
 // Função para buscar a lista de clientes no backend.
 const fetchClients = async () => {
   try {
-    // Usa o axios para fazer um pedido GET ao nosso backend.
-    const response = await axios.get(API_URL);
-    // Se o pedido for bem-sucedido, atualiza a nossa lista 'clients' com os dados recebidos.
+    // Usa a instância 'api' e a rota correta (com / no final).
+    const response = await api.get('/clients/');
     clients.value = response.data;
   } catch (error) {
-    // Se der erro, mostra uma mensagem na consola do navegador.
     console.error('Erro ao buscar clientes:', error);
+    alert('Não foi possível carregar a lista de clientes. Verifique o console para mais detalhes.');
   }
 };
 
-// 'onMounted' é um "gancho de ciclo de vida" do Vue.
-// A função dentro dele é executada automaticamente assim que o componente é criado e mostrado na tela.
+// onMounted continua igual, chamando a função para carregar os clientes.
 onMounted(() => {
-  fetchClients(); // Chamamos a função para carregar os clientes assim que a página abre.
+  fetchClients();
 });
 
-// Função para limpar o formulário e voltar ao modo de criação.
+// Função para limpar o formulário.
 const resetForm = () => {
   formData.value = { id: 0, name: '', email: '', phone: '' };
   isEditing.value = false;
@@ -58,47 +43,43 @@ const resetForm = () => {
 
 // Função executada quando o formulário é submetido.
 const handleSubmit = async () => {
-  // Verifica se estamos a editar um cliente existente.
-  if (isEditing.value) {
-    // Se sim, faz um pedido PUT para o backend, enviando os dados atualizados.
-    try {
-      await axios.put(`${API_URL}/${formData.value.id}`, formData.value);
-    } catch (error) {
-      console.error('Erro ao atualizar cliente:', error);
+  try {
+    if (isEditing.value) {
+      // Modo de edição: usa o método PUT na rota do cliente específico.
+      // Ex: /clients/1/
+      await api.put(`/clients/${formData.value.id}/`, formData.value);
+    } else {
+      // Modo de criação: usa o método POST na rota principal.
+      // Ex: /clients/
+      await api.post('/clients/', formData.value);
     }
-  } else {
-    // Se não, estamos a criar um novo cliente. Faz um pedido POST.
-    try {
-      await axios.post(API_URL, formData.value);
-    } catch (error) {
-      console.error('Erro ao criar cliente:', error);
-    }
+    // Após criar ou editar, limpa o formulário.
+    resetForm();
+    // E busca a lista de clientes atualizada do backend.
+    await fetchClients();
+  } catch (error) {
+    console.error('Erro ao salvar cliente:', error);
+    alert('Ocorreu um erro ao salvar o cliente. Verifique os dados e tente novamente.');
   }
-  // Após criar ou editar, limpa o formulário.
-  resetForm();
-  // E busca a lista de clientes atualizada do backend.
-  await fetchClients();
 };
 
-// Função chamada quando o botão "Editar" de um cliente é clicado.
+// Função para preparar a edição.
 const handleEdit = (client: Client) => {
-  // Copia os dados do cliente para o 'formData' para preencher o formulário.
   formData.value = { ...client };
-  // Ativa o modo de edição.
   isEditing.value = true;
 };
 
-// Função chamada quando o botão "Apagar" é clicado.
+// Função para apagar um cliente.
 const handleDelete = async (id: number) => {
-  // Pede confirmação ao utilizador antes de apagar.
   if (confirm('Tem a certeza que quer apagar este cliente?')) {
     try {
-      // Faz um pedido DELETE ao backend para o ID do cliente.
-      await axios.delete(`${API_URL}/${id}`);
+      // Usa o método DELETE na rota do cliente específico.
+      await api.delete(`/clients/${id}/`);
       // Recarrega a lista de clientes para remover o que foi apagado.
       await fetchClients();
     } catch (error) {
       console.error('Erro ao apagar cliente:', error);
+      alert('Não foi possível apagar o cliente.');
     }
   }
 };
