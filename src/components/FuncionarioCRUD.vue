@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import axios from 'axios';
+// Importa o serviço 'api' configurado para lidar com o baseURL (VITE_API_URL)
+import api from '../services/api'; 
 
 interface Employee {
   id: number;
@@ -10,69 +11,86 @@ interface Employee {
   role: string;
 }
 
-const API_URL = 'http://localhost:3000/api/clients';
+// Endpoint correto, registrado no backend (api/urls.py)
+const ENDPOINT = '/employees/';
 
+// --- Variáveis de Estado ---
 const employees = ref<Employee[]>([]);
 
-const formData = ref({ id: 0, name: '', email: '', phone: '' , role: ''});
-
+// Inicializa o formData com todos os campos do modelo Employee
+const formData = ref({ id: 0, name: '', email: '', phone: '', role: '' });
 const isEditing = ref(false);
 
+// --- Funções de Lógica ---
 
+// Função para buscar a lista de funcionários no backend.
 const fetchEmployees = async() => {
   try {
-    const response = await axios.get(API_URL);
-
+    const response = await api.get(ENDPOINT);
     employees.value= response.data
   }
   catch (error){
     console.error('Erro ao buscar funcionários:', error);
+    // Mensagem mais informativa se a API não estiver respondendo
+    alert('Erro ao carregar lista. Verifique se o servidor Django está rodando e se a URL da API (.env) está correta.');
   }
 };
 
+// Carrega os funcionários ao montar o componente
 onMounted(() => {
   fetchEmployees();
 });
 
+// Limpa o formulário e sai do modo de edição
 const resetForm =() => {
   formData.value = { id: 0, name: '', email: '', phone: '', role: '' }
   isEditing.value = false;
 };
 
+// Lida com a submissão do formulário (Criação ou Edição)
 const handleSubmit = async() => {
-  if (isEditing.value) {
-    try {
-      await axios.put(`${API_URL}/${formData.value.id}`, formData.value);
-    } catch (error) {
-      console.error('Erro ao atualizar funcionário:', error);
+  // Nota: O Django exige que e-mail seja válido e único. 
+  // Se o erro 400 persistir, use um novo e-mail ao testar.
+  try {
+    if (isEditing.value) {
+      // Edição: PUT para o recurso específico (ex: /employees/1/)
+      // A barra final é necessária pela convenção do Django Rest Framework
+      await api.put(`${ENDPOINT}${formData.value.id}/`, formData.value);
+      alert('Funcionário atualizado com sucesso!');
+    } else {
+      // Criação: POST para a coleção (ex: /employees/)
+      await api.post(ENDPOINT, formData.value);
+      alert('Funcionário adicionado com sucesso!');
     }
-
-  } else {
-    try {
-      await axios.post(API_URL, formData.value);
-    } catch (error) {
-      console.error('Erro ao criar funcionário:', error);
-    }
- }
- resetForm();
- await fetchEmployees();
+    
+    resetForm();
+    await fetchEmployees();
+  } catch (error) {
+    console.error('Erro ao salvar funcionário:', error);
+    // Dica para o usuário checar os dados (e-mail único!) e o console do BACKEND
+    alert('Ocorreu um erro ao salvar o funcionário. Verifique os dados (Nome e E-mail obrigatórios e únicos) e o console do Backend.');
+  }
  };
 
+// Prepara o formulário para edição
 const handleEdit = (employee: Employee) => {
   formData.value = {...employee };
   isEditing.value = true;
 };
+
+// Lida com a exclusão de um funcionário
  const handleDelete = async(id: number) => {
   if (confirm('Tem certeza que quer apagar este funcionário?')) {
     try{
-      await axios.delete(`${API_URL}/${id}`);
+      // Exclusão: DELETE para o recurso específico (ex: /employees/1/)
+      await api.delete(`${ENDPOINT}${id}/`);
+      alert('Funcionário apagado com sucesso!');
       await fetchEmployees();
     } catch (error){
       console.error('Erro ao apagar o funcionário:', error);
+      alert('Não foi possível apagar o funcionário.');
     }
-
   }
-
  };
 </script>
 
@@ -85,7 +103,7 @@ const handleEdit = (employee: Employee) => {
 
     <div class="form-group">
         <label for="name">Nome:</label>
-        <input id="name" type="text" v-model="formData.name" placeholder="Nome do Cliente" required />
+        <input id="name" type="text" v-model="formData.name" placeholder="Nome do Funcionário" required />
       </div>
 
     <div class="form-group">
@@ -122,12 +140,13 @@ const handleEdit = (employee: Employee) => {
       </thead>
       <tbody>
         <tr v-if="employees.length === 0">
-            <td colspan="4">Nenhum funcionário encontrado.</td>
+            <td colspan="5">Nenhum funcionário encontrado.</td>
         </tr>
         <tr v-for="employee in employees" :key="employee.id">
           <td>{{ employee.name }}</td>
           <td>{{ employee.email }}</td>
           <td>{{ employee.phone }}</td>
+          <td>{{ employee.role }}</td>
           <td class="actions">
             <button @click="handleEdit(employee)">Editar</button>
             <button class="delete" @click="handleDelete(employee.id)">Apagar</button>
@@ -209,5 +228,4 @@ hr {
     display: flex;
     gap: 10px;
 }
-
 </style>
