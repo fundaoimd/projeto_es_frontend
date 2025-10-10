@@ -77,7 +77,7 @@ function formatarDataBR(dataISO: string): string {
 
 <template>
   <div class="container">
-    <h1>Agendamento</h1>
+    <h1 class="titulo-centralizado">Agendamento</h1>
 
     <form @submit.prevent="handleSubmit" class="form-card">
       <h3>{{ isEditing ? 'Editar Agendamento' : 'Adicionar Novo Agendamento' }}</h3>
@@ -203,5 +203,8 @@ hr {
 .agendamento-table .actions {
   display: flex;
   gap: 10px;
+}
+.titulo-centralizado {
+  text-align: center;
 }
 </style>
