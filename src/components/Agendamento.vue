@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 
+// Define um "molde" (interface) para garantir que todos os objetos de agendamento
+// tenham sempre os mesmos campos (id, cliente, data, horario).
 interface Agendamento {
   id: number;
   cliente: string;
@@ -8,22 +10,64 @@ interface Agendamento {
   horario: string;
 }
 
+// --- VARIÁVEIS DE ESTADO ---
+// 'agendamentos' é a nossa lista de agendamentos, que começa com alguns exemplos.
 const agendamentos = ref<Agendamento[]>([
   { id: 1, cliente: 'teste1', data: '2025-09-30', horario: '10:00' },
   { id: 2, cliente: 'teste2', data: '2025-10-01', horario: '14:30' },
 ]);
 
-const novoAgendamento = ref<Agendamento>({ id: 0, cliente: '', data: '', horario: '' });
+// 'formData' representa os dados do formulário. Começa com valores vazios.
+const formData = ref<Agendamento>({ id: 0, cliente: '', data: '', horario: '' });
 
-function adicionarAgendamento() {
-  if (novoAgendamento.value.cliente && novoAgendamento.value.data && novoAgendamento.value.horario) {
-    agendamentos.value.push({
-      ...novoAgendamento.value,
-      id: agendamentos.value.length + 1
-    });
-    novoAgendamento.value = { id: 0, cliente: '', data: '', horario: '' };
+// 'isEditing' controla se o formulário está em modo de criação ou edição.
+const isEditing = ref(false);
+
+// --- FUNÇÕES ---
+
+// Função para limpar o formulário e voltar ao modo de criação.
+const resetForm = () => {
+  formData.value = { id: 0, cliente: '', data: '', horario: '' };
+  isEditing.value = false;
+};
+
+// Função executada quando o formulário é submetido.
+const handleSubmit = () => {
+  if (formData.value.cliente && formData.value.data && formData.value.horario) {
+    if (isEditing.value) {
+      // Atualiza o agendamento existente
+      const idx = agendamentos.value.findIndex(a => a.id === formData.value.id);
+      if (idx !== -1) {
+        agendamentos.value[idx] = { ...formData.value };
+      }
+    } else {
+      // Adiciona novo agendamento
+      agendamentos.value.push({
+        ...formData.value,
+        id: agendamentos.value.length > 0 ? Math.max(...agendamentos.value.map(a => a.id)) + 1 : 1
+      });
+    }
+    resetForm();
   }
-}
+};
+
+// Função chamada quando o botão "Editar" de um agendamento é clicado.
+const handleEdit = (agendamento: Agendamento) => {
+  formData.value = { ...agendamento };
+  isEditing.value = true;
+};
+
+// Função chamada quando o botão "Apagar" é clicado.
+const handleDelete = (id: number) => {
+  if (confirm('Tem certeza que deseja apagar este agendamento?')) {
+    agendamentos.value = agendamentos.value.filter(a => a.id !== id);
+    if (isEditing.value && formData.value.id === id) {
+      resetForm();
+    }
+  }
+};
+
+// Função para formatar a data para o padrão brasileiro.
 function formatarDataBR(dataISO: string): string {
   if (!dataISO) return '';
   const [ano, mes, dia] = dataISO.split('-');
@@ -32,62 +76,135 @@ function formatarDataBR(dataISO: string): string {
 </script>
 
 <template>
-  <div>
-    <h2>Agendamento:</h2>
-    <form @submit.prevent="adicionarAgendamento" style="margin-bottom: 2rem; background: #f7f7f7; padding: 1rem; border-radius: 8px;">
-      <div style="margin-bottom: 1rem;">
-        <label>Cliente:</label>
-        <input v-model="novoAgendamento.cliente" type="text" placeholder="Nome do cliente" required />
+  <div class="container">
+    <h1 class="titulo-centralizado">Agendamento</h1>
+
+    <form @submit.prevent="handleSubmit" class="form-card">
+      <h3>{{ isEditing ? 'Editar Agendamento' : 'Adicionar Novo Agendamento' }}</h3>
+
+      <div class="form-group">
+        <label for="cliente">Cliente:</label>
+        <input id="cliente" v-model="formData.cliente" type="text" placeholder="Nome do cliente" required />
       </div>
-      <div style="margin-bottom: 1rem;">
-        <label>Data:</label>
-        <input v-model="novoAgendamento.data" type="date" required />
+
+      <div class="form-group">
+        <label for="data">Data:</label>
+        <input id="data" v-model="formData.data" type="date" required />
       </div>
-      <div style="margin-bottom: 1rem;">
-        <label>Horário:</label>
-        <input v-model="novoAgendamento.horario" type="time" required />
+
+      <div class="form-group">
+        <label for="horario">Horário:</label>
+        <input id="horario" v-model="formData.horario" type="time" required />
       </div>
-      <button type="submit">Adicionar Agendamento</button>
+
+      <div class="form-actions">
+        <button type="submit">{{ isEditing ? 'Atualizar' : 'Adicionar' }}</button>
+        <button v-if="isEditing" type="button" @click="resetForm">Cancelar</button>
+      </div>
     </form>
 
-    <h3>Lista de Agendamentos</h3>
-    <ul>
-      <li v-for="ag in agendamentos" :key="ag.id">
-        <strong>{{ ag.cliente }}</strong> - {{ formatarDataBR(ag.data) }} às {{ ag.horario }}
-      </li>
-    </ul>
+    <hr />
+
+    <h2>Lista de Agendamentos</h2>
+    <table class="agendamento-table">
+      <thead>
+        <tr>
+          <th>Cliente</th>
+          <th>Data</th>
+          <th>Horário</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-if="agendamentos.length === 0">
+          <td colspan="4">Nenhum agendamento encontrado.</td>
+        </tr>
+        <tr v-for="ag in agendamentos" :key="ag.id">
+          <td>{{ ag.cliente }}</td>
+          <td>{{ formatarDataBR(ag.data) }}</td>
+          <td>{{ ag.horario }}</td>
+          <td class="actions">
+            <button @click="handleEdit(ag)">Editar</button>
+            <button class="delete" @click="handleDelete(ag.id)">Apagar</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </template>
 
 <style scoped>
-form label {
-  display: inline-block;
-  width: 80px;
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: sans-serif;
+  color: #333;
 }
-form input {
-  margin-left: 8px;
-  padding: 4px 8px;
-  border-radius: 4px;
-  border: 1px solid #ccc;
+.form-card {
+  background: #f9f9f9;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 30px;
+  border: 1px solid #ddd;
 }
-form button {
-  margin-top: 8px;
-  padding: 6px 16px;
-  border-radius: 4px;
-  border: none;
-  background: #1976d2;
-  color: #fff;
+.form-group {
+  margin-bottom: 15px;
+}
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
   font-weight: bold;
-  cursor: pointer;
 }
-ul {
-  list-style: none;
-  padding: 0;
-}
-li {
-  background: #e3e3e3;
-  margin-bottom: 8px;
-  padding: 8px 12px;
+.form-group input {
+  width: 100%;
+  padding: 10px;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
   border-radius: 4px;
+}
+.form-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+button {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  background-color: #1976d2;
+  color: white;
+  font-size: 14px;
+}
+button.delete {
+  background-color: #dc3545;
+}
+button:hover {
+  opacity: 0.9;
+}
+hr {
+  border: none;
+  border-top: 1px solid #eee;
+  margin: 30px 0;
+}
+.agendamento-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.agendamento-table th, .agendamento-table td {
+  border: 1px solid #ddd;
+  padding: 12px;
+  text-align: left;
+}
+.agendamento-table th {
+  background-color: #f2f2f2;
+}
+.agendamento-table .actions {
+  display: flex;
+  gap: 10px;
+}
+.titulo-centralizado {
+  text-align: center;
 }
 </style>
