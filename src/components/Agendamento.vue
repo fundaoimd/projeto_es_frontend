@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 
-// Define um "molde" (interface) para garantir que todos os objetos de agendamento
-// tenham sempre os mesmos campos (id, cliente, data, horario).
 interface Agendamento {
   id: number;
   cliente: string;
@@ -10,38 +8,27 @@ interface Agendamento {
   horario: string;
 }
 
-// --- VARIÁVEIS DE ESTADO ---
-// 'agendamentos' é a nossa lista de agendamentos, que começa com alguns exemplos.
 const agendamentos = ref<Agendamento[]>([
-  { id: 1, cliente: 'teste1', data: '2025-09-30', horario: '10:00' },
-  { id: 2, cliente: 'teste2', data: '2025-10-01', horario: '14:30' },
+  { id: 1, cliente: 'Maria da Silva', data: '2025-10-20', horario: '10:00' },
+  { id: 2, cliente: 'João Pereira', data: '2025-10-21', horario: '14:30' },
 ]);
 
-// 'formData' representa os dados do formulário. Começa com valores vazios.
 const formData = ref<Agendamento>({ id: 0, cliente: '', data: '', horario: '' });
-
-// 'isEditing' controla se o formulário está em modo de criação ou edição.
 const isEditing = ref(false);
 
-// --- FUNÇÕES ---
-
-// Função para limpar o formulário e voltar ao modo de criação.
 const resetForm = () => {
   formData.value = { id: 0, cliente: '', data: '', horario: '' };
   isEditing.value = false;
 };
 
-// Função executada quando o formulário é submetido.
 const handleSubmit = () => {
   if (formData.value.cliente && formData.value.data && formData.value.horario) {
     if (isEditing.value) {
-      // Atualiza o agendamento existente
       const idx = agendamentos.value.findIndex(a => a.id === formData.value.id);
       if (idx !== -1) {
         agendamentos.value[idx] = { ...formData.value };
       }
     } else {
-      // Adiciona novo agendamento
       agendamentos.value.push({
         ...formData.value,
         id: agendamentos.value.length > 0 ? Math.max(...agendamentos.value.map(a => a.id)) + 1 : 1
@@ -51,13 +38,11 @@ const handleSubmit = () => {
   }
 };
 
-// Função chamada quando o botão "Editar" de um agendamento é clicado.
 const handleEdit = (agendamento: Agendamento) => {
   formData.value = { ...agendamento };
   isEditing.value = true;
 };
 
-// Função chamada quando o botão "Apagar" é clicado.
 const handleDelete = (id: number) => {
   if (confirm('Tem certeza que deseja apagar este agendamento?')) {
     agendamentos.value = agendamentos.value.filter(a => a.id !== id);
@@ -67,7 +52,6 @@ const handleDelete = (id: number) => {
   }
 };
 
-// Função para formatar a data para o padrão brasileiro.
 function formatarDataBR(dataISO: string): string {
   if (!dataISO) return '';
   const [ano, mes, dia] = dataISO.split('-');
@@ -77,7 +61,7 @@ function formatarDataBR(dataISO: string): string {
 
 <template>
   <div class="container">
-    <h1 class="titulo-centralizado">Agendamento</h1>
+    <h1 class="page-title">Agendamentos</h1>
 
     <form @submit.prevent="handleSubmit" class="form-card">
       <h3>{{ isEditing ? 'Editar Agendamento' : 'Adicionar Novo Agendamento' }}</h3>
@@ -99,112 +83,171 @@ function formatarDataBR(dataISO: string): string {
 
       <div class="form-actions">
         <button type="submit">{{ isEditing ? 'Atualizar' : 'Adicionar' }}</button>
-        <button v-if="isEditing" type="button" @click="resetForm">Cancelar</button>
+        <button v-if="isEditing" type="button" @click="resetForm" class="btn-cancel">Cancelar</button>
       </div>
     </form>
-
-    <hr />
-
-    <h2>Lista de Agendamentos</h2>
-    <table class="agendamento-table">
-      <thead>
-        <tr>
-          <th>Cliente</th>
-          <th>Data</th>
-          <th>Horário</th>
-          <th>Ações</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-if="agendamentos.length === 0">
-          <td colspan="4">Nenhum agendamento encontrado.</td>
-        </tr>
-        <tr v-for="ag in agendamentos" :key="ag.id">
-          <td>{{ ag.cliente }}</td>
-          <td>{{ formatarDataBR(ag.data) }}</td>
-          <td>{{ ag.horario }}</td>
-          <td class="actions">
-            <button @click="handleEdit(ag)">Editar</button>
-            <button class="delete" @click="handleDelete(ag.id)">Apagar</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    
+    <div class="table-container">
+      <h2>Lista de Agendamentos</h2>
+      <table class="crud-table">
+        <thead>
+          <tr>
+            <th>Cliente</th>
+            <th>Data</th>
+            <th>Horário</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-if="agendamentos.length === 0">
+            <td colspan="4">Nenhum agendamento encontrado.</td>
+          </tr>
+          <tr v-for="ag in agendamentos" :key="ag.id">
+            <td>{{ ag.cliente }}</td>
+            <td>{{ formatarDataBR(ag.data) }}</td>
+            <td>{{ ag.horario }}</td>
+            <td class="actions">
+              <button @click="handleEdit(ag)" class="btn-edit">Editar</button>
+              <button class="btn-delete" @click="handleDelete(ag.id)">Apagar</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>
 
 <style scoped>
 .container {
-  max-width: 800px;
+  width: 100%;
+  max-width: 900px;
   margin: 0 auto;
   padding: 20px;
-  font-family: sans-serif;
-  color: #333;
 }
+
+.page-title {
+  text-align: center;
+  margin-bottom: 2rem;
+  font-size: 2.2rem;
+  color: var(--heading-color);
+}
+
 .form-card {
-  background: #f9f9f9;
-  padding: 20px;
-  border-radius: 8px;
+  background: var(--form-bg-color);
+  padding: 30px;
+  border-radius: 12px;
   margin-bottom: 30px;
-  border: 1px solid #ddd;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 15px var(--shadow-color);
+  text-align: left;
 }
+
+.form-card h3 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
 .form-group {
-  margin-bottom: 15px;
+  margin-bottom: 1.5rem;
 }
+
 .form-group label {
   display: block;
-  margin-bottom: 5px;
-  font-weight: bold;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #666;
 }
+
 .form-group input {
   width: 100%;
-  padding: 10px;
+  padding: 12px 15px;
   box-sizing: border-box;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  transition: border-color 0.3s, box-shadow 0.3s;
 }
+
+.form-group input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(219, 112, 147, 0.2);
+}
+
 .form-actions {
   display: flex;
   gap: 10px;
   margin-top: 20px;
+  justify-content: flex-end;
 }
-button {
-  padding: 10px 15px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  background-color: #1976d2;
-  color: white;
-  font-size: 14px;
+
+.btn-cancel {
+  background-color: #f1f1f1;
+  color: var(--text-color);
+  border: 1px solid #ddd;
 }
-button.delete {
-  background-color: #dc3545;
+
+.btn-cancel:hover {
+  background-color: #e7e7e7;
 }
-button:hover {
-  opacity: 0.9;
+
+.table-container {
+  width: 100%;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px var(--shadow-color);
 }
-hr {
-  border: none;
-  border-top: 1px solid #eee;
-  margin: 30px 0;
+
+.table-container h2 {
+  margin-top: 0;
+  text-align: center;
+  margin-bottom: 1.5rem;
 }
-.agendamento-table {
+
+.crud-table {
   width: 100%;
   border-collapse: collapse;
 }
-.agendamento-table th, .agendamento-table td {
-  border: 1px solid #ddd;
-  padding: 12px;
+
+.crud-table th, .crud-table td {
+  border-bottom: 1px solid var(--border-color);
+  padding: 15px;
   text-align: left;
 }
-.agendamento-table th {
-  background-color: #f2f2f2;
+
+.crud-table th {
+  background-color: var(--background-color);
+  font-weight: 700;
+  color: var(--primary-color);
 }
-.agendamento-table .actions {
+
+.crud-table tbody tr:hover {
+  background-color: var(--background-color);
+}
+
+.crud-table .actions {
   display: flex;
   gap: 10px;
 }
-.titulo-centralizado {
-  text-align: center;
+
+.actions button {
+  padding: 6px 12px;
+  font-size: 14px;
+}
+
+.btn-edit {
+  background-color: var(--secondary-color);
+  color: var(--heading-color);
+}
+.btn-edit:hover {
+  background-color: #f7a0b0;
+}
+
+.btn-delete {
+  background-color: var(--danger-color);
+}
+.btn-delete:hover {
+  background-color: var(--danger-hover-color);
 }
 </style>
