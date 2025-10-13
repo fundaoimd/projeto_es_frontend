@@ -1,11 +1,13 @@
 # Resumo da Daily 002
 
+📅 **Data:** 19/09/2025  
+
 - **Nathan Lopes**
   - Terminou a dinâmica das palavras cruzadas no aplicativo.
   - Não sentiu nenhuma dificuldade no processo.
   - **Próximos passos:** Começar a programar o CRUD.
 
-- **Diego Áxel**
+- **Diêgo Axel**
   - Revisou as *issues* e definiu os níveis de prioridade de cada uma.
   - Estudou um pouco de Vue.js.
   - Sentiu um pouco de dificuldade na linguagem e sugeriu transição para outra.
@@ -17,5 +19,5 @@
   - Também sugeriu mudança de linguagem.
   - **Próximos passos:** Auxiliar no desenvolvimento do banco de dados para iniciar a programação de fato.
 
-- **Hildemberg**
+- **Hildemberg Elling**
   - Faltou à reunião.
