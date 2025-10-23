@@ -21,6 +21,11 @@ const routes = [
     name: 'Funcionario',
     component: () => import('./pages/MenuFuncionario.vue'),
   },
+  {
+    path: '/servicos',
+    name: 'Servicos',
+    component: () => import('./pages/MenuServicos.vue'),
+  },
 ]
 
 const router = createRouter({

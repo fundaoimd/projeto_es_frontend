@@ -11,6 +11,9 @@
       <router-link :to="{ name: 'Funcionario' }" class="nav-button">
         Ir para Cadastro de Funcionário
       </router-link>
+      <router-link :to="{ name: 'Servicos' }" class="nav-button">
+        Ir para Serviços
+      </router-link>
       <router-link :to="{ name: 'Agendamento' }" class="nav-button">
         Ir para Agendamento
       </router-link>
