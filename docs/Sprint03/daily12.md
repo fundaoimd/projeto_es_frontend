@@ -5,7 +5,7 @@
   - **Próximos passos:** Apoiar na finalização e testes de integração entre módulos.
 
 - **Diêgo Axel**  
-  - **Integração total do módulo de Agendamento** com os demais módulos (Clientes, Funcionários e Serviços).  
+  - **Integração parcial do módulo de Agendamento** com os demais módulos (Clientes, Funcionários e Serviços).  
   - Trabalhou junto com Nathan na **finalização da estilização da interface**.  
   - **Próximos passos:** Testar o fluxo de agendamento completo dentro do sistema.
 
